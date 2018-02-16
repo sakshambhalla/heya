@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{firstname}}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+    html {
+        background: url(../images/blur.jpg) no-repeat;
+        background-size: cover;
+        height: 100%;
+        overflow-y: hidden;
+    }
+    .container{
+        position:relative;
+        padding:0 5%;
+        height: 95vh;
+        width: 85%;
+        margin: 1% auto;
+        background-color: #fdffd8;
+        box-shadow: 5px 5px 5px 5px rgba(0, 0, 0, .4);
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    #result{
+        max-height: 60%;
+        overflow-y: auto;
+    }
+    .input-field input[type=text]:focus + label {
+        color: #A569BD !important;
+    }
+    .input-field input[type=text]:focus {
+        border-bottom: 1px solid #A569BD !important;
+        box-shadow: 0 1px 0 0 #A569BD !important;
+    }
+    .btn-large {
+        background-color: #A569BD;
+    }
+    .btn-large:hover {
+        background-color: #BB8FCE;
+    }
+    .bubble{
+        border-radius: 5px;
+        box-shadow: 0 0 6px #B2B2B2;
+        display: inline-block;
+        padding: 10px 18px;
+        position: relative;
+        vertical-align: top;
+    }
+
+    .bubble::before {
+        content: "\00a0";
+        display: block;
+        height: 16px;
+        position: absolute;
+        top: 11px;
+        transform:             rotate( 29deg ) skew( -35deg );
+        -moz-transform:    rotate( 29deg ) skew( -35deg );
+        -ms-transform:     rotate( 29deg ) skew( -35deg );
+        -o-transform:      rotate( 29deg ) skew( -35deg );
+        -webkit-transform: rotate( 29deg ) skew( -35deg );
+        width:  20px;
+    }
+
+    .you {
+        background-color: #e6e6ed;
+        float: left;
+        margin: 5px 45px 5px 20px;
+    }
+    .point:hover {
+        cursor:pointer;
+        opacity:0.7;
+    }
+
+    .you:before {
+        background-color: #e6e6ed;
+        box-shadow: -2px 2px 2px 0 rgba( 178, 178, 178, .4 );
+        left: -9px;
+    }
+
+    .me {
+        background-color: #edc98f;
+        float: right;
+        margin: 5px 20px 5px 45px;
+    }
+    .me::before {
+        background-color: #edc98f;
+        box-shadow: 2px -2px 2px 0 rgba( 178, 178, 178, .4 );
+        right: -9px;
+    }
+    .addEmoticon:hover{
+        cursor:pointer;
+    }
+    .addEmoticon{
+        font-size:30px;
+    }
+</style>
+
+</head>
+
+<body>
+<div class="container">
+    <div class="row">
+        <h2 class="center-align" style="font-family: 'cursive'; color: #9B59B6; font-weight: bolder !important; text-shadow:1px 1px purple;margin: 1rem 0 1rem 0">heya!</h2>
+        <div style="font-weight: bold; margin: 0" class="center-align"><h4 style="margin: 0">{{firstname}}</h4></div>
+        <div><h6 class="center-align" style="margin: 0">{{username}}</h6></div>
+    </div>
+    <hr>
+    <div id="result"></div>
+    <div id="emoticonTray" style="width:50%;margin:0 auto; padding:20px;overflow:auto; height:200px;"></div>
+    <div id="userChat" style="position:absolute;bottom:0;width: 95%">
+        <div class="row">
+            <div class="col s1">
+                <a href="/"><button class="waves-effect waves-light btn-large" id="dis"><i class="material-icons" style="font-size:30px;">call_end</i></button></a>
+            </div>
+            <div class="col s1"></div>
+            <div class="input-field col s6">
+                <input type="text" id="inp" class="validate">
+                <label for="inp">User Name</label>
+            </div>
+            <div class="col s1" style="text-align:center;"><button class="btn" id="openEmoticons" style="text-align:center; width:50%;"><i class="material-icons" style="margin: 0 auto; display:block; width:50%;">insert_emoticons</i></button></div>
+            <div class="col s2">
+                <button class="waves-effect waves-light btn-large" id="b"><i class="material-icons" style="font-size:30px;">send</i></button>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    let socket = io();
+    let inp = document.getElementById('inp');
+    let btn = document.getElementById('b');
+    let result = document.getElementById('result');
+    let dis = document.getElementById('dis');
+    let count = 0;
+    socket.on('recieve', function(data){
+        result.innerHTML += `<div class=" point bubble you"><span style="color: blue; font-weight: bold">${data.firstname}:</span> ${data.msg}</div><br><br><br>`;
+    });
+
+    inp.onkeydown = function (ev) {
+        if(ev.keyCode === 13)
+            btn.onclick();
+    };
+    btn.onclick = function() {
+        if(inp.value === '')
+            return;
+        socket.emit('send', {firstname: '{{firstname}}', msg: inp.value});
+        result.innerHTML += `<div class="point bubble me"><span style="color: red; font-weight: bold"> You:</span> ${inp.value}</div><br><br><br>`;
+        inp.value = "";
+    };
+    socket.emit('con', '{{firstname}}');
+    socket.on('new_connect', function(data) {
+        result.innerHTML += `<div class="center-align">${data.data} Connected, Total Users: ${data.count}</div>`;
+    });
+    socket.on('discon', function(data){
+        result.innerHTML += `<div class="center-align"> Total Users: ${data}</div>`;
+    });
+    dis.onclick = function(){
+        socket.disconnect();
+    };
+
+    document.getElementById('openEmoticons').onclick = function(){
+        count++;
+        document.getElementById('emoticonTray').innerHTML = '';
+        $.ajax({
+            url:`/user/emoji?query=`,
+            success: function(res){
+                if(count%2 === 0)
+                for(var i = 0; i<res.length; i++)
+                document.getElementById('emoticonTray').innerHTML += `<span class="addEmoticon" onclick="addEmoticon(this)">${res[i].emoji}</span>`;
+            }
+        });
+    };
+
+    function addEmoticon(element){
+        console.log(element);
+        inp.value += element.innerHTML;
+    }
+</script>
+
+</body>
+</html>
