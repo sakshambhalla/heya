@@ -18,13 +18,11 @@ io.on('connection', function(soc){
     });
     soc.on('con', function(data) {
         count = count + 1;
-        console.log(count);
         soc.broadcast.emit('new_connect', {data: data, count: count});
     });
-    soc.on('disconnect', function () {
+    soc.on('disconnect', function (data) {
         count = count - 1;
-        console.log(count);
-        soc.emit('discon', count);
+        soc.broadcast.emit('disconnected-user', {count: count});
     });
 });
 

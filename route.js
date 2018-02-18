@@ -21,7 +21,6 @@ route.use(passport.initialize());             //Initialises the passport library
 route.use(passport.session());                //Initialises the session library..
 
 route.get('/emoji',function(req,res){
-    console.log(req.query);
     let emojiList = emojis.searchEmoji(req.query.query);
     res.send(emojiList);
 });
@@ -72,13 +71,19 @@ passport.deserializeUser(function(id, done) {
 
 route.get('/home', function(req,res){
     checkUser(req,res);
-    res.render('home',req.user);
+    let user = req.user;
+    req.logOut();
+    res.render('home',user);
 });
 
 
 
 route.get('/login', function(req,res){
-    res.render('login', {red: 255, green: 0, msg: 'Invalid Username or Password'});
+    res.render('login', {color: "red", msg: 'Invalid Username or Password'});
+});
+
+route.get('/reconnect', function (req, res) {
+    res.render('login', {color: "blue", msg: 'Login to Reconnect'});
 });
 
 route.post('/signup', function(req,res){
@@ -95,7 +100,7 @@ route.post('/signup', function(req,res){
             if (flag === 1) res.render('signup',{msgExists:"Username already exists"});
             else {
                 database.addUser(req.body);
-                res.render('login', {red: 0, green: 255, msg: 'Successfully Signed up. Login to Continue'})
+                res.render('login', {color: "green", msg: 'Successfully Signed up. Login to Continue'})
             }
         });
     }
