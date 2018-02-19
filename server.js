@@ -6,13 +6,16 @@ const database = require('./database');
 const server = require('http').Server(app);
 const socket = require('socket.io');
 const io = socket(server);
-let port = 7560;
+let port = process.env.PORT || 7560;
 
 app.use('/', express.static('public'));
 
 let count = 0;
 
 io.on('connection', function(soc){
+    soc.on('total', function () {
+        soc.emit('total', {count: count});
+    });
     soc.on('send', function(data) {
         soc.broadcast.emit('recieve', data);
     });
@@ -20,7 +23,7 @@ io.on('connection', function(soc){
         count = count + 1;
         soc.broadcast.emit('new_connect', {data: data, count: count});
     });
-    soc.on('disconnect', function (data) {
+    soc.on('disconnect', function () {
         count = count - 1;
         soc.broadcast.emit('disconnected-user', {count: count});
     });
