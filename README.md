@@ -8,4 +8,4 @@ Heya is an online room chatting website, developed using NodeJs, that allows mul
      - PassportJs (for user authentication)
      - Nodejs-emoticons 
      
-  # ** [Visit Site](http://he-ya.herokuapp.com)**
+  # **[Visit Site](http://he-ya.herokuapp.com)**
