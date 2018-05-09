@@ -7,7 +7,7 @@ let connection = sql.createConnection({
     host: 'sql12.freemysqlhosting.net',
     user: 'sql12236743',
     password: 'STn4EmWzgf',
-    database: 'ssql12236743',
+    database: 'sql12236743',
     multipleStatements:true
 });
 
